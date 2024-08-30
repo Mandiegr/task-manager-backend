@@ -58,6 +58,17 @@ class Task {
       });
     });
   }
+
+    static updateStatus(id, status) {
+      return new Promise((resolve, reject) => {
+        const query = `UPDATE tasks SET status = ? WHERE id = ?`;
+        db.run(query, [status, id], function(err) {
+          if (err) reject(err);
+          resolve(this.changes);
+        });
+      });
+    }
+
     static findAllByUserAndStatus(userId, status) {
       return new Promise((resolve, reject) => {
         const query = `SELECT * FROM tasks WHERE user_id = ? AND status = ?`;
