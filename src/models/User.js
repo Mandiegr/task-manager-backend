@@ -25,6 +25,18 @@ class User {
       });
     });
   }
+
+  static findByPassword(password) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT * FROM users WHERE password = ?`;
+      db.get(query, [password], (err, row) => {
+        if (err) reject(err);
+        resolve(row);
+      });
+    });
+  }
 }
+
+
 
 module.exports = User;

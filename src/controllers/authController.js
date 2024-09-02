@@ -7,22 +7,28 @@ require('dotenv').config();
 exports.register = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findByEmail(email);
-    if (user) return res.status(400).json({ message: 'Usuário já existe' });
+  
+    const userByEmail = await User.findByEmail(email);
+    if (userByEmail) {
+      return res.status(400).json({ message: 'E-mail já registrado' });
+    }
 
-    const passCrypto =  encrypt(password, process.env.JWT_SECRET)
+   
+    const passCrypto = encrypt(password, process.env.JWT_SECRET);
+    const userByPassword = await User.findByPassword(passCrypto);
+    if (userByPassword) {
+      return res.status(400).json({ message: 'Senha já registrada, forneça uma senha diferente' });
+    }
 
     const newUser = { email, password: passCrypto };
-
     const userId = await User.create(newUser);
-    
-    const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET);
 
+    const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET);
     res.status(201).json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Erro no servidor', error: err.message });
   }
-};
+};;
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
